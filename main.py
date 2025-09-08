@@ -1,5 +1,6 @@
 import discord
 import os
+import requests
 from dotenv import load_dotenv
 
 # Loads the .env file
@@ -24,6 +25,12 @@ async def on_message(message):
     if message.author == client.user:
         return 
     
-    await message.channel.send(f"[{message.guild.name}] #{message.channel.name} | {message.author.name}: {message.content}");
+    text = f"[{message.guild.name}] #{message.channel.name} | {message.author.name}: {message.content}"; # Craft the message
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage?chat_id={TELEGRAM_CHAT_ID}" # Pass telegram url into requests.get
+    params = {"chat_id": TELEGRAM_CHAT_ID, "text": text}
+    requests.get(url,params=params)
 
 client.run(DISCORD_TOKEN)
+
+
+
