@@ -11,7 +11,7 @@ class clientException(Exception):
     pass;
 
 FILE_PATH = 'log.txt'
-logger = logging.getLogger('bot_log')
+logger = logging.getLogger()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler = TimedRotatingFileHandler("bot.log",when='midnight',endcoding='utf-8')
 
