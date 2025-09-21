@@ -1,7 +1,24 @@
 import discord
 import os
 import requests
+import logging
+from logging.handlers import TimedRotatingFileHandler
+import datetime
 from dotenv import load_dotenv
+
+# Custom exception
+class clientException(Exception):
+    pass;
+
+FILE_PATH = 'log.txt'
+logger = logging.getLogger('bot_log')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler = TimedRotatingFileHandler("bot.log",when='midnight',endcoding='utf-8')
+
+logger.setLevel(logging.INFO)
+handler.setFormatter(formatter)
+logger.addHandler(handler) # Add handler(Handler obj which decides where logs go [Stream/File/TimedRotating]) to logger
+
 
 # Loads the .env file
 load_dotenv()
@@ -16,7 +33,7 @@ client = discord.Client(intents = Intents) #creates the bot client, telling Disc
 
 @client.event
 async def on_ready():
-    print(f"We have logged in as {client.user}")
+    logger.error(f"We have logged in as {client.user}")
 
 
 @client.event
@@ -28,9 +45,15 @@ async def on_message(message):
     text = f"[{message.guild.name}] #{message.channel.name} | {message.author.name}: {message.content}"; # Craft the message
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage?chat_id={TELEGRAM_CHAT_ID}" # Pass telegram url into requests.get
     params = {"chat_id": TELEGRAM_CHAT_ID, "text": text}
-    requests.get(url,params=params)
+    try:
+        requests.get(url,params=params)
+    except Exception as e:
+        logger.error(f"Request.get failed. \n {e}")
 
-client.run(DISCORD_TOKEN)
+try:
+    client.run(DISCORD_TOKEN)
+except Exception as e:
+    logger.error(f"client.run{DISCORD_TOKEN} couldn't be ran. \n{e}")
 
 
 
